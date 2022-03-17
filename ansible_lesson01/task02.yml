@@ -1,0 +1,22 @@
+---
+- name: Lession 01 task 02 (Delete Apache and disable port)
+  hosts: nodes
+  become: yes
+  tasks:
+
+    - name: Delete httpd
+      yum:  
+        name: httpd       
+        state: removed
+
+    - name: Delete file index.html 
+      file:
+        path: /var/www/html/index.html
+        state: absent
+
+    - name: Disable httpd port
+      firewalld:
+        immediate: true
+        port: 80/tcp
+        permanent: true
+        state: disabled

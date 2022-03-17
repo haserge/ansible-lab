@@ -1,0 +1,24 @@
+---
+- name: Lession 01 task 03 (Change grub bootloader)
+  hosts: nodes
+  become: yes
+  tasks:
+
+    - name: Add net.ifnames in command line  
+      lineinfile:
+        state: present
+        dest: /etc/default/grub
+        backrefs: yes
+        regexp: '^(GRUB_CMDLINE_LINUX=(?!.* net.ifnames)\"[^\"]+)(\".*)'
+        line: '\1 net.ifnames=0\2'
+
+    - name: Add biosdevname in command line
+      lineinfile:
+        state: present
+        dest: /etc/default/grub
+        backrefs: yes
+        regexp: '^(GRUB_CMDLINE_LINUX=(?!.* biosdevname)\"[^\"]+)(\".*)'
+        line: '\1 biosdevname=0\2'
+
+    - name: Save changes to grub config file
+      command: grub2-mkconfig -o /boot/grub2/grub.cfg

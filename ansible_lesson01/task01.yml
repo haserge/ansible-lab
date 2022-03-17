@@ -1,0 +1,29 @@
+---
+- name: Lession 01 task 01 (Install Apache)
+  hosts: nodes
+  become: yes
+  tasks:
+
+    - name: Install httpd
+      yum:  
+        name: httpd
+        state: installed
+
+    - name: Ensure the httpd service is running and enable it at boot
+      service:
+        name: httpd 
+        state: started 
+        enabled: yes
+
+    - name: Create file index.html
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          Welcome to my web server
+
+    - name: Enable httpd port
+      firewalld:
+        immediate: true
+        port: 80/tcp
+        permanent: true
+        state: enabled
