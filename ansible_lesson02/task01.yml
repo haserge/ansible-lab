@@ -1,0 +1,16 @@
+---
+- name: Lession 02 task 01 (Create users)
+  hosts: nodes
+  vars_files:
+    - vars/users
+  become: yes
+  tasks:
+
+    - name: Create user
+      user:
+        name: "{{ item.value.username }}"
+        comment: "{{ item.value.email }}"
+        home: "{{ item.value.homedir }}"
+        password: "{{ item.value.pwhash | password_hash('sha512') }}"
+        update_password: on_create
+      with_dict: "{{ users }}"
