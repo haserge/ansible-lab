@@ -1,0 +1,18 @@
+---
+- name: Lession 03 task 01 (Installing Apache using roles and changing the default page)
+  hosts: nodes
+  become: yes
+ 
+  roles:
+
+   - apache_default
+
+  tasks:
+
+  - name: Create file index.html
+    copy:
+      dest: /var/www/html/index.html
+      content: |
+        Welcome to my web server
+
+

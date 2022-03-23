@@ -1,0 +1,29 @@
+---
+- name: Include specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install httpd on CentOS
+  yum:
+    name: httpd
+    state: present
+  when: ansible_facts.distribution == required_os
+
+- name: Ensure the httpd service is running and enable it at boot
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: Collect facts about system services
+  service_facts:
+
+- name: Checking the state of the web server service
+  debug:
+    var: ansible_facts.services["httpd.service"].state
+
+- name: Enable httpd port
+  firewalld:
+    port: 80/tcp
+    permanent: true
+    state: enabled
+  notify: Restart firewall

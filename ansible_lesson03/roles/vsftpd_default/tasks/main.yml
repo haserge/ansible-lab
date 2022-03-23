@@ -1,0 +1,25 @@
+---
+- name: Install vsftpd
+  yum:
+    name: vsftpd
+    state: present
+
+- name: Ensure the vsftpd service is running and enable it at boot
+  service:
+    name: vsftpd
+    state: started
+    enabled: yes
+
+- name: Enable data and command ports for vsftpd
+  firewalld:
+    port: 20-21/tcp
+    permanent: true
+    state: enabled
+  notify: Restart firewall
+
+- name: Enable ports for passive mode for vsftpd
+  firewalld:
+    port: 30000-31000/tcp
+    permanent: true
+    state: enabled
+  notify: Restart firewall

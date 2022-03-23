@@ -1,0 +1,56 @@
+---
+- name: Lession 03 task 02 (Installing vsftpd using roles and configuring it according to the task)
+  hosts: nodes
+  vars_files:
+    - vars/vsftpd_vars.yml
+  become: yes
+ 
+  roles:
+
+   - vsftpd_default
+
+  tasks:
+
+  - name: Configure VSFTPD using a template
+    template:
+      src: vsftpd.j2
+      dest: "{{ vsftpd_config_template_path }}"
+      owner: root
+      group: root
+      mode: "0644"
+    notify: Restart vsftpd
+
+  - name: Create vsftp directories
+    file:
+      state: directory
+      recurse: yes
+      path: "{{ anon_root }}/upload"
+      owner: "{{ ftp_username }}"
+
+  - name: Set pub directory permissions
+    file:
+      dest: "{{ anon_root }}"
+      mode: 0555 
+      owner: "{{ ftp_username }}"
+
+  - name: Set SELinux file-context for upload directory
+    sefcontext:
+      target: "{{ anon_root }}/upload"
+      setype: "public_content_rw_t"
+      state: present
+    notify: Restore context
+
+  - name: Enable SELinux boolean
+    seboolean:
+      name: "ftpd_anon_write"
+      state: yes
+      persistent: yes
+
+  handlers:
+  - name: Restart vsftpd
+    service:
+      name: vsftpd
+      state: restarted
+
+  - name: Restore context
+    shell: restorecon -Rv "{{ anon_root }}/upload"
